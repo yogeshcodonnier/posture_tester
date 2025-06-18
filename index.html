@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Media Upload with Remove</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f9f9f9;
+      margin: 0;
+    }
+
+    .media-label {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    .upload-container {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    .upload-box {
+      width: 300px;
+      height: 300px;
+      border: 2px dashed #0d6efd;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      color: #ccc;
+      cursor: pointer;
+      position: relative;
+      background-color: white;
+    }
+
+    .upload-box:hover {
+      border-color: #0d6dfd93;
+    }
+
+    .upload-box input[type="file"] {
+      position: absolute;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+
+    .image-wrapper {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 2px dashed #797979;
+      border-radius: 10px;
+    }
+
+    .preview-image {
+      width: 300px;
+      height: 300px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 1px solid dotted;
+    }
+
+    .remove-btn {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      background: red;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 18px;
+      padding: 0;
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <div class="card" style="width: 40rem;">
+    <div class="card-body ">
+      <div class="row">
+        <div class="media-label card-title text-center h1 fs-5">Test Your Posture!</div>
+        <div class="upload-container" id="preview-container">
+          <label class="upload-box" id="upload-btn">
+            +
+            <input type="file" multiple accept="image/*" onchange="previewFiles(event)" id="fileInput">
+          </label>
+        </div>
+
+        <div class="img_details p-5 d-none">
+          <div class="posture_type h1 text-center"></div>
+          <div class="retting text-center h3 p-3"></div>
+          <div class="feedback h5 text-center"></div>
+        </div>
+
+        <button class="btn btn-primary m-auto w-50 mt-5" id="submitBtn">
+          <span class="indicator-label">TEST</span>
+          <span class="indicator-progress d-none">Please wait...
+            <span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
+        </button>
+
+      </div>
+    </div>
+  </div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const submitBtn = document.getElementById('submitBtn');
+    const imgDetails = document.querySelector('.img_details');
+    const indicatorProgress = submitBtn.querySelector('.indicator-progress');
+    const indicatorLabel = submitBtn.querySelector('.indicator-label');
+
+    async function getData() {
+      const input = document.getElementById('fileInput');
+      const formData = new FormData();
+
+      submitBtn.disabled = true;
+      indicatorLabel.classList.add('d-none');
+      indicatorProgress.classList.add('d-block');
+      indicatorProgress.classList.remove('d-none');
+
+      if (input.files.length === 0) {
+        alert('No file selected');
+        indicatorLabel.classList.add('d-block');
+        indicatorLabel.classList.remove('d-none');
+        indicatorProgress.classList.add('d-none');
+        indicatorProgress.classList.remove('d-block');
+        submitBtn.disabled = false;
+        return;
+      }
+
+      formData.append('files', input.files[0]);
+
+      const url = "http://127.0.0.1:5000/api/detect";
+
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          body: formData,
+        });
+
+        const json = await response.json();
+
+        if (json.status == 0) {
+          alert(json.msg);
+          indicatorLabel.classList.add('d-block');
+          indicatorLabel.classList.remove('d-none');
+          indicatorProgress.classList.add('d-none');
+          indicatorProgress.classList.remove('d-block');
+          submitBtn.disabled = false;
+          return;
+        }
+
+        indicatorLabel.classList.add('d-block');
+        indicatorLabel.classList.remove('d-none');
+        indicatorProgress.classList.add('d-none');
+        indicatorProgress.classList.remove('d-block');
+        submitBtn.classList.add('d-none');
+        submitBtn.disabled = false;
+
+
+        document.getElementsByClassName('posture_type')[0].innerHTML = json.posture_class;
+        document.getElementsByClassName('feedback')[0].innerHTML = json.feedback;
+
+        const rating = json.posture_rating;
+
+        let stars = '';
+        for (let i = 0; i < 10; i++) {
+          if (rating > i) {
+            stars += `<i class="fa-solid fa-star" style="color : #e9b900;"></i>`;
+          } else {
+            stars += `<i class="fa-regular fa-star"></i>`;
+          }
+        }
+
+        document.getElementsByClassName('retting')[0].innerHTML = stars;
+        imgDetails.classList.add('d-block');
+        imgDetails.classList.remove('d-none');
+
+        console.log('Server response:', json);
+
+      } catch (error) {
+        console.error('Error:', error.message);
+        throw new Error(`Failed with status: ${response.status}`);
+
+      }
+    }
+
+    submitBtn.addEventListener('click', async function () {
+      await getData();
+    });
+
+
+    function previewFiles(event) {
+      const files = event.target.files;
+      const container = document.getElementById('preview-container');
+      const uploadBtn = document.getElementById('upload-btn');
+
+      uploadBtn.style.display = 'none';
+
+      for (const file of files) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const wrapper = document.createElement("div");
+          wrapper.className = "image-wrapper";
+
+          const img = document.createElement("img");
+          img.src = e.target.result;
+          img.className = "preview-image";
+
+          const removeBtn = document.createElement("button");
+          removeBtn.textContent = "×";
+          removeBtn.className = "remove-btn";
+          removeBtn.onclick = function () {
+            uploadBtn.style.display = 'flex';
+            wrapper.remove();
+            document.getElementById('fileInput').value = '';
+            submitBtn.classList.add('d-block');
+            submitBtn.classList.remove('d-none');
+            imgDetails.classList.add('d-none');
+            imgDetails.classList.remove('d-block');
+          };
+
+          wrapper.appendChild(img);
+          wrapper.appendChild(removeBtn);
+          container.appendChild(wrapper);
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+  </script>
+
+</body>
+
+</html>
