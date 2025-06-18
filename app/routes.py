@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, render_template
 from .services import imgDetect
 import torch
 
@@ -7,7 +7,7 @@ model = torch.hub.load('ultralytics/yolov5', 'custom', path='C:/xampp/htdocs/yol
 
 @main.route('/', methods=['GET'])
 def hello_world():
-    return jsonify({"message": "Hello, World!"})
+    return render_template('index.html')
 
 @main.route('/detect', methods=['POST'])
 def detect():
