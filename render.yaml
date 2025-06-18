@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: hello-world-flask
+    name: hello-world-root
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app.main:app
+    startCommand: gunicorn app:app
