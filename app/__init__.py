@@ -9,7 +9,7 @@ def create_app():
 
     CORS(app)
 
-    from .routes import main
+    from app.routes import main
     # app.register_blueprint(main)
     app.register_blueprint(main, url_prefix="/api")
 
