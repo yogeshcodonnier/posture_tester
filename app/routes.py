@@ -1,5 +1,4 @@
-from flask import Blueprint, jsonify, request, render_template
-import torch
+from flask import Blueprint, jsonify
 
 main = Blueprint('main', __name__)
 # model = torch.hub.load('ultralytics/yolov5', 'custom', path='C:/xampp/htdocs/yolo_model/posture_tester/best_posture_new_1.pt', force_reload=False)
