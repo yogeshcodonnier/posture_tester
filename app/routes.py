@@ -18,7 +18,6 @@ model = torch.hub.load('ultralytics/yolov5', 'custom', path='best_posture_new_1.
 # weights = Path(__file__).resolve().parent.parent / 'best_posture_new_1.pt'
 # model = DetectMultiBackend(weights, device='cpu')
 
-
 @main.route('/', methods=['GET'])
 def hello_world():
     return render_template('index.html')

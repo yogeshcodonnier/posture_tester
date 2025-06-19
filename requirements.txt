@@ -11,3 +11,4 @@ psutil
 scipy
 tqdm
 pandas
+requests
