@@ -1,3 +1,4 @@
 flask
 gunicorn
 flask-cors
+torch==2.2.2
