@@ -1,12 +1,13 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, render_template
+import torch
 
 main = Blueprint('main', __name__)
-# model = torch.hub.load('ultralytics/yolov5', 'custom', path='C:/xampp/htdocs/yolo_model/posture_tester/best_posture_new_1.pt', force_reload=False)
+model = torch.hub.load('ultralytics/yolov5', 'custom', path='C:/xampp/htdocs/yolo_model/posture_tester/best_posture_new_1.pt', force_reload=False)
 
 @main.route('/', methods=['GET'])
 def hello_world():
-    return jsonify({'error': 'No files found'})
-    # return render_template('index.html')
+    # return jsonify({'error': 'No files found'})
+    return render_template('index.html')
 
 # @main.route('/detect', methods=['POST'])
 # def detect():
