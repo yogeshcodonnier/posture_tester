@@ -1,5 +1,4 @@
 from flask import Blueprint, jsonify, request, render_template
-from .services import imgDetect
 import torch
 
 main = Blueprint('main', __name__)
