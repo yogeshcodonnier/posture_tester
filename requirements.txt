@@ -4,8 +4,6 @@ flask-cors
 torch
 opencv-python
 numpy
-opencv-python
-numpy
 matplotlib
 pillow
 PyYAML

@@ -206,6 +206,8 @@
 
             } catch (error) {
                 console.error('Error:', error.message);
+                console.log(error);
+
                 throw new Error(`Failed with status: ${response.status}`);
 
             }
