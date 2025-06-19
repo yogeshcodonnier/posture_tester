@@ -21,7 +21,6 @@ model = torch.hub.load('ultralytics/yolov5', 'custom', path='best_posture_new_1.
 
 @main.route('/', methods=['GET'])
 def hello_world():
-    # return jsonify({'error': 'No files found'})
     return render_template('index.html')
 
 @main.route('/detect', methods=['POST'])
