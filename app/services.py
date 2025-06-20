@@ -1,11 +1,13 @@
-# from PIL import Image
-# # import torch
-# import io
-# import math
-
+from PIL import Image
 # import torch
-# import numpy as np
+import io
+import math
 
+import torch
+import numpy as np
+import sys
+import numpy as np
+from pathlib import Path
 # # model = torch.hub.load('ultralytics/yolov5', 'custom', path='C:/xampp/htdocs/yolo_model/flask_apis/best_posture_new_1.pt', force_reload=False)
 
 # def generate_feedback(posture_class, rating):
@@ -154,12 +156,6 @@
 # #         }
 
 
-
-import sys
-import io
-import numpy as np
-from PIL import Image
-from pathlib import Path
 
 # Add yolov5 directory to path
 yolov5_path = Path(__file__).resolve().parent.parent / 'yolov5'
