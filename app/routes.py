@@ -19,11 +19,11 @@ model = DetectMultiBackend(weights, device='cpu', dnn=False)
 def index():
     return render_template('index.html')
 
-# @main.route('/detect', methods=['POST'])
-# def detect():
-#     if 'files' not in request.files:
-#         return jsonify({'status': '0', 'msg': 'No files found'}), 400
+@main.route('/detect', methods=['POST'])
+def detect():
+    if 'files' not in request.files:
+        return jsonify({'status': '0', 'msg': 'No files found'}), 400
 
-#     img = request.files['files']
-#     result = imgDetect(img, model)
-#     return jsonify(result)
+    img = request.files['files']
+    result = imgDetect(img, model)
+    return jsonify(result)
