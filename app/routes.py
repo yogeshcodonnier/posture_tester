@@ -10,7 +10,7 @@ import sys
 YOLOV5_PATH = Path(__file__).resolve().parent.parent / 'yolov5'
 sys.path.append(str(YOLOV5_PATH))
 
-from yolov5.models.common import DetectMultiBackend
+from models.common import DetectMultiBackend
 
 main = Blueprint('main', __name__)
 
