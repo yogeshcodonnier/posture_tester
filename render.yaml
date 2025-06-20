@@ -4,6 +4,10 @@ services:
     runtime: python
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn run:app
+    buildCommand: |
+      git submodule update --init --recursive
+      pip install -r requirements.txt
+
     # envVars:
     #   - key: PYTHON_VERSION
     #     value: 3.10
