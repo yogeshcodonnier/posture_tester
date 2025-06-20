@@ -8,19 +8,19 @@ YOLOV5_PATH = Path(__file__).resolve().parent.parent / 'yolov5'
 sys.path.append(str(YOLOV5_PATH))
 
 
-from models.common import DetectMultiBackend
+# from models.common import DetectMultiBackend
 
 main = Blueprint('main', __name__)
 
-weights = Path(__file__).resolve().parent.parent / 'best.pt'
-model = DetectMultiBackend(weights, device='cpu', dnn=False)
+# weights = Path(__file__).resolve().parent.parent / 'best.pt'
+# model = DetectMultiBackend(weights, device='cpu', dnn=False)
 
-# model = torch.load('best_posture_new_1.pt')['model'].float().fuse().eval()
-# example_input = torch.randn(1, 3, 640, 640)
-# traced_model = torch.jit.trace(model, example_input)
-# traced_model.save('best_posture_scripted.pt')
+model = torch.load('best.pt')['model'].float().fuse().eval()
+example_input = torch.randn(1, 3, 640, 640)
+traced_model = torch.jit.trace(model, example_input)
+traced_model.save('best_posture_scripted.pt')
 
-# model = torch.jit.load('best_posture_scripted.pt')
+model = torch.jit.load('best_posture_scripted.pt')
 
 @main.route('/', methods=['GET'])
 def index():
