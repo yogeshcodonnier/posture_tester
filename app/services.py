@@ -161,7 +161,7 @@ from pathlib import Path
 yolov5_path = Path(__file__).resolve().parent.parent / 'yolov5'
 sys.path.append(str(yolov5_path))
 
-from utils.augmentations import letterbox  # ✅ Needed for image preprocessing
+from utils.augmentations import letterbox
 
 def rate_posture(posture_class, confidence):
     if posture_class == "Good":

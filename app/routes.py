@@ -12,21 +12,18 @@ from models.common import DetectMultiBackend
 main = Blueprint('main', __name__)
 
 # Load model once
-weights = Path(__file__).resolve().parent.parent / 'best_posture_new_1.pt'
+weights = Path(__file__).resolve().parent.parent / 'best_posture_new.pt'
 model = DetectMultiBackend(weights, device='cpu', dnn=False)
-
-print("model")
-print(model)
 
 @main.route('/', methods=['GET'])
 def index():
     return render_template('index.html')
 
-@main.route('/detect', methods=['POST'])
-def detect():
-    if 'files' not in request.files:
-        return jsonify({'status': '0', 'msg': 'No files found'}), 400
+# @main.route('/detect', methods=['POST'])
+# def detect():
+#     if 'files' not in request.files:
+#         return jsonify({'status': '0', 'msg': 'No files found'}), 400
 
-    img = request.files['files']
-    result = imgDetect(img, model)
-    return jsonify(result)
+#     img = request.files['files']
+#     result = imgDetect(img, model)
+#     return jsonify(result)
