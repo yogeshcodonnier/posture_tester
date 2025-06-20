@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, render_template
-from app.services import imgDetect
+# from app.services import imgDetect
 from pathlib import Path
 import sys
 
