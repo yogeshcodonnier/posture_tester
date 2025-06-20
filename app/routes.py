@@ -3,18 +3,16 @@ from app.services import imgDetect
 from pathlib import Path
 import sys
 
-# Add YOLOv5 path
-# yolov5_root = Path(__file__).resolve().parent.parent / 'yolov5'
-# sys.path.append(str(yolov5_root))
-
 YOLOV5_PATH = Path(__file__).resolve().parent.parent / 'yolov5'
 sys.path.append(str(YOLOV5_PATH))
 
-from models.common import DetectMultiBackend
+print("YOLOv5 path added:", YOLOV5_PATH)
+print("sys.path:", sys.path)
+
+from yolov5.models.common import DetectMultiBackend
 
 main = Blueprint('main', __name__)
 
-# Load model once
 weights = Path(__file__).resolve().parent.parent / 'best_posture_new_1.pt'
 model = DetectMultiBackend(weights, device='cpu', dnn=False)
 
