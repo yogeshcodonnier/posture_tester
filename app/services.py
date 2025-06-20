@@ -1,13 +1,15 @@
-# from PIL import Image
-# # import torch
-# import io
-# import math
-# import cv2
+from PIL import Image
 # import torch
-# import numpy as np
-# import sys
-# import numpy as np
-# from pathlib import Path
+import io
+import math
+import cv2
+import torch
+import numpy as np
+import sys
+import numpy as np
+from pathlib import Path
+
+
 # # model = torch.hub.load('ultralytics/yolov5', 'custom', path='C:/xampp/htdocs/yolo_model/flask_apis/best_posture_new_1.pt', force_reload=False)
 
 # def generate_feedback(posture_class, rating):
@@ -157,47 +159,49 @@
 
 
 
-# yolov5_path = Path(__file__).resolve().parent.parent / 'yolov5'
-# sys.path.append(str(yolov5_path))
+yolov5_path = Path(__file__).resolve().parent.parent / 'yolov5'
+sys.path.append(str(yolov5_path))
 
-# from yolov5.utils.augmentations import letterbox
+from yolov5.utils.augmentations import letterbox
+from yolov5.utils.general import non_max_suppression, scale_boxes
+from yolov5.utils.torch_utils import select_device
 
-# def rate_posture(posture_class, confidence):
-#     if posture_class == "Good":
-#         if confidence >= 0.9:
-#             return 10
-#         elif confidence >= 0.8:
-#             return 8
-#         elif confidence >= 0.7:
-#             return 7
-#         else:
-#             return 6
-#     elif posture_class == "Bad":
-#         if confidence >= 0.9:
-#             return 5
-#         elif confidence >= 0.8:
-#             return 4
-#         elif confidence >= 0.7:
-#             return 3
-#         else:
-#             return 2
-#     return 1
+def rate_posture(posture_class, confidence):
+    if posture_class == "Good":
+        if confidence >= 0.9:
+            return 10
+        elif confidence >= 0.8:
+            return 8
+        elif confidence >= 0.7:
+            return 7
+        else:
+            return 6
+    elif posture_class == "Bad":
+        if confidence >= 0.9:
+            return 5
+        elif confidence >= 0.8:
+            return 4
+        elif confidence >= 0.7:
+            return 3
+        else:
+            return 2
+    return 1
 
-# def generate_feedback(posture_class, rating):
-#     if posture_class == "Good":
-#         if rating >= 9:
-#             return "Excellent posture! Keep it up!"
-#         elif rating >= 7:
-#             return "Good job! Your posture looks solid. Small improvements can make it perfect."
-#         else:
-#             return "Your posture is okay. Try to stand straighter and align your shoulders."
-#     elif posture_class == "Bad":
-#         if rating >= 5:
-#             return "You're improving, but still need to work on straightening your posture."
-#         else:
-#             return "Posture needs attention. Straighten your back, relax shoulders, and avoid slouching."
-#     else:
-#         return "Unable to determine posture quality. Please try again."
+def generate_feedback(posture_class, rating):
+    if posture_class == "Good":
+        if rating >= 9:
+            return "Excellent posture! Keep it up!"
+        elif rating >= 7:
+            return "Good job! Your posture looks solid. Small improvements can make it perfect."
+        else:
+            return "Your posture is okay. Try to stand straighter and align your shoulders."
+    elif posture_class == "Bad":
+        if rating >= 5:
+            return "You're improving, but still need to work on straightening your posture."
+        else:
+            return "Posture needs attention. Straighten your back, relax shoulders, and avoid slouching."
+    else:
+        return "Unable to determine posture quality. Please try again."
 
 # def imgDetect(img, model):
 #     try:
@@ -210,9 +214,11 @@
 #         img_resized = img_resized.astype(np.float32) / 255.0
 #         img_resized = np.transpose(img_resized, (2, 0, 1))
 #         img_resized = np.expand_dims(img_resized, axis=0)
-#         img_tensor = torch.from_numpy(img_resized).to('cpu')
+#         # img_tensor = torch.from_numpy(img_resized).to('cpu')
 
-#         results = model(img_tensor)
+#         img_tensor = torch.from_numpy(img_resized).to('cpu')
+#         with torch.no_grad():
+#             results = model(img_tensor)
 #         pred = results[0]
 
 #         detections = []
@@ -222,7 +228,10 @@
 #         for det in pred:
 #             if det is not None and len(det):
 #                 for *xyxy, conf, cls in det.tolist():
-#                     posture_class = model.names[int(cls)]
+#                     if conf < 0.25:
+#                         continue
+#                     posture_class = model.names[int(cls)].capitalize()
+#                     # posture_class = model.names[int(cls)]
 #                     confidence = float(conf)
 #                     detections.append({
 #                         'bbox': xyxy,
@@ -253,3 +262,61 @@
 #             'status': '0',
 #             'msg': f'Detection failed: {str(e)}'
 #         }
+
+def imgDetect(img_file, model):
+    try:
+        # Load and preprocess image
+        image = Image.open(io.BytesIO(img_file.read())).convert('RGB')
+        img_np = np.array(image)
+        img_resized, ratio, pad = letterbox(img_np, new_shape=(640, 640))
+        img_resized = img_resized.astype(np.float32) / 255.0
+        img_resized = np.transpose(img_resized, (2, 0, 1))  # HWC to CHW
+        img_resized = np.expand_dims(img_resized, axis=0)  # Add batch dim
+        img_tensor = torch.from_numpy(img_resized).to(model.device).float()
+
+        # Inference
+        pred = model(img_tensor)[0]
+        pred = non_max_suppression(pred, conf_thres=0.25, iou_thres=0.45)
+
+        # Parse results
+        detections = []
+        posture_class = None
+        confidence = 0.0
+
+        for det in pred:
+            if det is not None and len(det):
+                det[:, :4] = scale_boxes(img_tensor.shape[2:], det[:, :4], image.size).round()
+
+                for *xyxy, conf, cls in det.tolist():
+                    posture_class = model.names[int(cls)]
+                    confidence = float(conf)
+                    detections.append({
+                        'bbox': xyxy,
+                        'confidence': confidence,
+                        'class': posture_class
+                    })
+                    break
+
+        if posture_class is None:
+            raise ValueError("No posture detected.")
+        
+        posture_rating = rate_posture(posture_class, confidence)
+        feedback = generate_feedback(posture_class, posture_rating)
+
+        return {
+            'status': '1',
+            'msg': 'Success',
+            'filename': img_file.filename,
+            'posture_class': posture_class,
+            'confidence': confidence,
+            'detections': detections,
+            'posture_rating': posture_rating,
+            'feedback': feedback,
+            'detections': detections
+        }
+
+    except Exception as e:
+        return {
+            'status': '0',
+            'msg': f'Detection failed: {str(e)}'
+        }

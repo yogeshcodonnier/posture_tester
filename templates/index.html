@@ -288,6 +288,7 @@
             formData.append('files', input.files[0]);
 
             const url = "http://127.0.0.1:5000/api/detect";
+            // const url = "https://posture-tester.onrender.com/api/detect";
 
             try {
                 const response = await fetch(url, {
