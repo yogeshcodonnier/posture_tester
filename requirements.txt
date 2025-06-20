@@ -13,3 +13,4 @@ tqdm
 pandas
 requests
 Pillow
+torchvision
