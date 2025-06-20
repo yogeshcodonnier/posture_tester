@@ -1,13 +1,13 @@
-from PIL import Image
+# from PIL import Image
+# # import torch
+# import io
+# import math
+# import cv2
 # import torch
-import io
-import math
-import cv2
-import torch
-import numpy as np
-import sys
-import numpy as np
-from pathlib import Path
+# import numpy as np
+# import sys
+# import numpy as np
+# from pathlib import Path
 # # model = torch.hub.load('ultralytics/yolov5', 'custom', path='C:/xampp/htdocs/yolo_model/flask_apis/best_posture_new_1.pt', force_reload=False)
 
 # def generate_feedback(posture_class, rating):
@@ -157,137 +157,99 @@ from pathlib import Path
 
 
 
-# Add yolov5 directory to path
-yolov5_path = Path(__file__).resolve().parent.parent / 'yolov5'
-sys.path.append(str(yolov5_path))
+# yolov5_path = Path(__file__).resolve().parent.parent / 'yolov5'
+# sys.path.append(str(yolov5_path))
 
-# from utils.augmentations import letterbox
+# from yolov5.utils.augmentations import letterbox
 
-def letterbox(im, new_shape=(640, 640), color=(114, 114, 114), auto=True, scaleFill=False, scaleup=True, stride=32):
-    """Resizes and pads image to new_shape with stride-multiple constraints, returns resized image, ratio, padding."""
-    shape = im.shape[:2]  # current shape [height, width]
-    if isinstance(new_shape, int):
-        new_shape = (new_shape, new_shape)
+# def rate_posture(posture_class, confidence):
+#     if posture_class == "Good":
+#         if confidence >= 0.9:
+#             return 10
+#         elif confidence >= 0.8:
+#             return 8
+#         elif confidence >= 0.7:
+#             return 7
+#         else:
+#             return 6
+#     elif posture_class == "Bad":
+#         if confidence >= 0.9:
+#             return 5
+#         elif confidence >= 0.8:
+#             return 4
+#         elif confidence >= 0.7:
+#             return 3
+#         else:
+#             return 2
+#     return 1
 
-    # Scale ratio (new / old)
-    r = min(new_shape[0] / shape[0], new_shape[1] / shape[1])
-    if not scaleup:  # only scale down, do not scale up (for better val mAP)
-        r = min(r, 1.0)
+# def generate_feedback(posture_class, rating):
+#     if posture_class == "Good":
+#         if rating >= 9:
+#             return "Excellent posture! Keep it up!"
+#         elif rating >= 7:
+#             return "Good job! Your posture looks solid. Small improvements can make it perfect."
+#         else:
+#             return "Your posture is okay. Try to stand straighter and align your shoulders."
+#     elif posture_class == "Bad":
+#         if rating >= 5:
+#             return "You're improving, but still need to work on straightening your posture."
+#         else:
+#             return "Posture needs attention. Straighten your back, relax shoulders, and avoid slouching."
+#     else:
+#         return "Unable to determine posture quality. Please try again."
 
-    # Compute padding
-    ratio = r, r  # width, height ratios
-    new_unpad = int(round(shape[1] * r)), int(round(shape[0] * r))
-    dw, dh = new_shape[1] - new_unpad[0], new_shape[0] - new_unpad[1]  # wh padding
-    if auto:  # minimum rectangle
-        dw, dh = np.mod(dw, stride), np.mod(dh, stride)  # wh padding
-    elif scaleFill:  # stretch
-        dw, dh = 0.0, 0.0
-        new_unpad = (new_shape[1], new_shape[0])
-        ratio = new_shape[1] / shape[1], new_shape[0] / shape[0]  # width, height ratios
+# def imgDetect(img, model):
+#     try:
+#         image = Image.open(io.BytesIO(img.read())).convert('RGB')
 
-    dw /= 2  # divide padding into 2 sides
-    dh /= 2
+#         image_np = np.array(image)
 
-    if shape[::-1] != new_unpad:  # resize
-        im = cv2.resize(im, new_unpad, interpolation=cv2.INTER_LINEAR)
-    top, bottom = int(round(dh - 0.1)), int(round(dh + 0.1))
-    left, right = int(round(dw - 0.1)), int(round(dw + 0.1))
-    im = cv2.copyMakeBorder(im, top, bottom, left, right, cv2.BORDER_CONSTANT, value=color)  # add border
-    return im, ratio, (dw, dh)
+#         img_resized, _, _ = letterbox(image_np, new_shape=(640, 640))
 
-def rate_posture(posture_class, confidence):
-    if posture_class == "Good":
-        if confidence >= 0.9:
-            return 10
-        elif confidence >= 0.8:
-            return 8
-        elif confidence >= 0.7:
-            return 7
-        else:
-            return 6
-    elif posture_class == "Bad":
-        if confidence >= 0.9:
-            return 5
-        elif confidence >= 0.8:
-            return 4
-        elif confidence >= 0.7:
-            return 3
-        else:
-            return 2
-    return 1
+#         img_resized = img_resized.astype(np.float32) / 255.0
+#         img_resized = np.transpose(img_resized, (2, 0, 1))
+#         img_resized = np.expand_dims(img_resized, axis=0)
+#         img_tensor = torch.from_numpy(img_resized).to('cpu')
 
-def generate_feedback(posture_class, rating):
-    if posture_class == "Good":
-        if rating >= 9:
-            return "Excellent posture! Keep it up!"
-        elif rating >= 7:
-            return "Good job! Your posture looks solid. Small improvements can make it perfect."
-        else:
-            return "Your posture is okay. Try to stand straighter and align your shoulders."
-    elif posture_class == "Bad":
-        if rating >= 5:
-            return "You're improving, but still need to work on straightening your posture."
-        else:
-            return "Posture needs attention. Straighten your back, relax shoulders, and avoid slouching."
-    else:
-        return "Unable to determine posture quality. Please try again."
+#         results = model(img_tensor)
+#         pred = results[0]
 
-def imgDetect(img, model):
-    try:
-        # Read and convert image to RGB
-        image = Image.open(io.BytesIO(img.read())).convert('RGB')
+#         detections = []
+#         posture_class = None
+#         confidence = 0.0
 
-        # Convert to NumPy array
-        image_np = np.array(image)
+#         for det in pred:
+#             if det is not None and len(det):
+#                 for *xyxy, conf, cls in det.tolist():
+#                     posture_class = model.names[int(cls)]
+#                     confidence = float(conf)
+#                     detections.append({
+#                         'bbox': xyxy,
+#                         'confidence': confidence,
+#                         'class': posture_class
+#                     })
+#                     break
 
-        # Resize using letterbox for YOLO compatibility
-        img_resized, _, _ = letterbox(image_np, new_shape=(640, 640))
+#         if posture_class is None:
+#             raise ValueError("Posture class ('Good' or 'Bad') not found in the detections.")
 
-        # Convert to float32
-        img_resized = img_resized.astype(np.float32) / 255.0
-        img_resized = np.transpose(img_resized, (2, 0, 1))  # HWC to CHW
-        img_resized = np.expand_dims(img_resized, axis=0)  # Add batch dim
-        img_tensor = torch.from_numpy(img_resized).to('cpu')
+#         posture_rating = rate_posture(posture_class, confidence)
+#         feedback = generate_feedback(posture_class, posture_rating)
 
-        # Run detection
-        results = model(img_tensor)
-        pred = results[0]  # raw output
+#         return {
+#             'status': '1',
+#             'msg': 'Detection and posture evaluation successful',
+#             'filename': img.filename,
+#             'posture_class': posture_class,
+#             'confidence': confidence,
+#             'posture_rating': posture_rating,
+#             'feedback': feedback,
+#             'detections': detections
+#         }
 
-        detections = []
-        posture_class = None
-        confidence = 0.0
-
-        for det in pred:
-            if det is not None and len(det):
-                for *xyxy, conf, cls in det.tolist():
-                    posture_class = model.names[int(cls)]
-                    confidence = float(conf)
-                    detections.append({
-                        'bbox': xyxy,
-                        'confidence': confidence,
-                        'class': posture_class
-                    })
-                    break  # take first detection only
-
-        if posture_class is None:
-            raise ValueError("Posture class ('Good' or 'Bad') not found in the detections.")
-
-        posture_rating = rate_posture(posture_class, confidence)
-        feedback = generate_feedback(posture_class, posture_rating)
-
-        return {
-            'status': '1',
-            'msg': 'Detection and posture evaluation successful',
-            'filename': img.filename,
-            'posture_class': posture_class,
-            'confidence': confidence,
-            'posture_rating': posture_rating,
-            'feedback': feedback,
-            'detections': detections
-        }
-
-    except Exception as e:
-        return {
-            'status': '0',
-            'msg': f'Detection failed: {str(e)}'
-        }
+#     except Exception as e:
+#         return {
+#             'status': '0',
+#             'msg': f'Detection failed: {str(e)}'
+#         }
