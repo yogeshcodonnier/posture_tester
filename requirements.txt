@@ -1,14 +1,20 @@
+# flask
+# gunicorn
+# flask-cors
+# torch
+# opencv-python
+# numpy
+# matplotlib
+# pillow
+# PyYAML
+# psutil
+# scipy
+# tqdm
+# pandas
+# requests
+
 flask
 gunicorn
-flask-cors
 torch
-opencv-python
 numpy
-matplotlib
-pillow
-PyYAML
-psutil
-scipy
-tqdm
-pandas
-requests
+Pillow
