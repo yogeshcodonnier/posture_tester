@@ -4,8 +4,11 @@ from pathlib import Path
 import sys
 
 # Add YOLOv5 path
-yolov5_root = Path(__file__).resolve().parent.parent / 'yolov5'
-sys.path.append(str(yolov5_root))
+# yolov5_root = Path(__file__).resolve().parent.parent / 'yolov5'
+# sys.path.append(str(yolov5_root))
+
+YOLOV5_PATH = Path(__file__).resolve().parent.parent / 'yolov5'
+sys.path.append(str(YOLOV5_PATH))
 
 from yolov5.models.common import DetectMultiBackend
 

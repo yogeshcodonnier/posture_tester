@@ -159,11 +159,15 @@ from pathlib import Path
 
 
 
-yolov5_path = Path(__file__).resolve().parent.parent / 'yolov5'
-sys.path.append(str(yolov5_path))
+# yolov5_path = Path(__file__).resolve().parent.parent / 'yolov5'
+# sys.path.append(str(yolov5_path))
+
+YOLOV5_PATH = Path(__file__).resolve().parent.parent / 'yolov5'
+sys.path.append(str(YOLOV5_PATH))
 
 from yolov5.utils.augmentations import letterbox
 from yolov5.utils.general import non_max_suppression, scale_boxes
+
 from yolov5.utils.torch_utils import select_device
 
 def rate_posture(posture_class, confidence):
