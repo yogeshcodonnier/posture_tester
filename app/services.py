@@ -2,7 +2,6 @@ from PIL import Image
 # import torch
 import io
 import math
-import cv2
 import torch
 import numpy as np
 import sys
@@ -165,8 +164,8 @@ from pathlib import Path
 YOLOV5_PATH = Path(__file__).resolve().parent.parent / 'yolov5'
 sys.path.append(str(YOLOV5_PATH))
 
-from yolov5.utils.augmentations import letterbox
-from yolov5.utils.general import non_max_suppression, scale_boxes
+from utils.augmentations import letterbox
+from utils.general import non_max_suppression, scale_boxes
 
 # from utils.torch_utils import select_device
 

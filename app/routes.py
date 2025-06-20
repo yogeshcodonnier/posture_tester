@@ -9,7 +9,7 @@ sys.path.append(str(YOLOV5_PATH))
 print("YOLOv5 path added:", YOLOV5_PATH)
 print("sys.path:", sys.path)
 
-from yolov5.models.common import DetectMultiBackend
+from models.common import DetectMultiBackend
 
 main = Blueprint('main', __name__)
 
